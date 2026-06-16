@@ -169,17 +169,32 @@ streamlit run dashboard/app.py
 
 ## 📸 Screenshots
 
-Add screenshots in a folder named:
+## 📸 Project Screenshots
 
-```text
-screenshots/
-```
+### Dashboard Overview
 
-Suggested images:
+![Dashboard Overview](screenshots/dashboard_overview.png)
 
-* dashboard.png
-* scraper_execution.png
-* postgresql_records.png
+### Search & Filters
+
+![Dashboard Filters](screenshots/dashboard_filters.png)
+
+### Analytics Dashboard
+
+![Dashboard Analytics](screenshots/dashboard_analytics.png)
+
+---
+
+## ⚙️ Backend Processing
+
+### PostgreSQL Storage
+
+![PostgreSQL Records](screenshots/postgresql_records.png)
+
+### Scraper Execution
+
+![Scraper Execution](screenshots/scraper_execution.png)
+
 
 ---
 
