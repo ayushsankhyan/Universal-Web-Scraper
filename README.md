@@ -204,4 +204,5 @@ BE CSE (Hons) - Artificial Intelligence & Machine Learning
 Chandigarh University
 
 GitHub: https://github.com/ayushsankhyan
+Mail: sankhyanayush95@gmail.com
 
