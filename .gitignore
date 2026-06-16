@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+
+*.csv
+
+.scrapy/
+.pytest_cache/
+
+.env
+.vscode/
+
+*.log
