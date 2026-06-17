@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -268,4 +268,4 @@ st.dataframe(
     summary,
     use_container_width=True
 )
-```
+
