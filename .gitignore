@@ -58,6 +58,8 @@ ENV/
 # CSV Outputs
 # =========================
 *.csv
+*.csv
+!data/products.csv
 
 # =========================
 # Generated Data
