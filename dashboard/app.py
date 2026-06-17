@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -16,23 +17,75 @@ st.set_page_config(
 # -----------------------------
 st.title("🌐 Universal Scraper Dashboard")
 
-st.markdown("""
-Monitor and analyze scraped product data.
+st.info("""
+📚 **Current Dataset Source:** Books To Scrape
 
-### How to use
+🔗 Website: https://books.toscrape.com
 
-**Search Title**
-- Search for a product name
-
-**Min Price**
-- Minimum product price
-
-**Max Price**
-- Maximum product price
-
-**Stock Filter**
-- Filter products by stock availability
+This dashboard visualizes product data collected using a custom-built web scraping pipeline.
 """)
+
+# -----------------------------
+# PROJECT METRICS
+# -----------------------------
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric(
+        "🌍 Source",
+        "BooksToScrape"
+    )
+
+with col2:
+    st.metric(
+        "📦 Dataset",
+        "1000 Records"
+    )
+
+with col3:
+    st.metric(
+        "🛠️ Stack",
+        "Python"
+    )
+
+# -----------------------------
+# PROJECT INFO
+# -----------------------------
+st.subheader("📌 Project Overview")
+
+st.markdown("""
+### 🌍 Source Website
+
+[🔗 Visit Books To Scrape](https://books.toscrape.com)
+
+### Purpose
+
+This project demonstrates a complete web scraping and analytics workflow.
+
+### Technologies Used
+
+- Python
+- Requests
+- BeautifulSoup
+- Selenium
+- Scrapy
+- PostgreSQL
+- Pandas
+- Streamlit
+- Plotly
+
+### Extracted Fields
+
+- Product Title
+- Product Price
+- Stock Availability
+
+### Workflow
+
+Website → Scraper → Data Cleaning → Storage → Dashboard Analytics
+""")
+
+st.markdown("---")
 
 # -----------------------------
 # LOAD DATA
@@ -55,7 +108,7 @@ df.columns = [
 ]
 
 # -----------------------------
-# PRICE CLEANING
+# CLEAN PRICE
 # -----------------------------
 df["Price"] = pd.to_numeric(
     df["Price"],
@@ -113,8 +166,10 @@ if stock_filter != "All":
     ]
 
 # -----------------------------
-# KPIs
+# KPI CARDS
 # -----------------------------
+st.subheader("📈 Analytics Overview")
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -149,14 +204,12 @@ with col3:
 # -----------------------------
 # CHART
 # -----------------------------
-st.subheader(
-    "📊 Price Distribution"
-)
+st.subheader("📊 Price Distribution")
 
 fig = px.histogram(
     df,
     x="Price",
-    nbins=10,
+    nbins=15,
     title="Product Price Distribution"
 )
 
@@ -168,9 +221,7 @@ st.plotly_chart(
 # -----------------------------
 # TABLE
 # -----------------------------
-st.subheader(
-    "📋 Products"
-)
+st.subheader("📋 Product Records")
 
 st.dataframe(
     df,
@@ -180,13 +231,41 @@ st.dataframe(
 # -----------------------------
 # DOWNLOAD
 # -----------------------------
+st.subheader("⬇ Export Data")
+
 csv = df.to_csv(
     index=False
 )
 
 st.download_button(
-    "⬇ Download CSV",
+    "Download CSV",
     csv,
     "products.csv",
     "text/csv"
 )
+
+# -----------------------------
+# DATA SUMMARY
+# -----------------------------
+st.subheader("📊 Dataset Summary")
+
+summary = pd.DataFrame({
+    "Metric": [
+        "Total Products",
+        "Average Price",
+        "Minimum Price",
+        "Maximum Price"
+    ],
+    "Value": [
+        len(df),
+        round(df["Price"].mean(), 2),
+        round(df["Price"].min(), 2),
+        round(df["Price"].max(), 2)
+    ]
+})
+
+st.dataframe(
+    summary,
+    use_container_width=True
+)
+```
