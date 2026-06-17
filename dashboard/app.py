@@ -1,41 +1,6 @@
 import streamlit as st
 import pandas as pd
-import psycopg2
 import plotly.express as px
-
-
-# -----------------------------
-# DATABASE
-# -----------------------------
-def get_products():
-
-    connection = psycopg2.connect(
-        host="localhost",
-        database="scraper_db",
-        user="postgres",
-        password="12345"
-    )
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        SELECT
-            id,
-            url,
-            title,
-            price,
-            stock
-        FROM scraped_products
-        ORDER BY id DESC
-    """)
-
-    rows = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return rows
-
 
 # -----------------------------
 # PAGE CONFIG
@@ -52,56 +17,46 @@ st.set_page_config(
 st.title("🌐 Universal Scraper Dashboard")
 
 st.markdown("""
-Monitor, search and analyze data scraped from websites.
+Monitor and analyze scraped product data.
 
 ### How to use
 
 **Search Title**
-- Type part of a product name
-- Example: `sharp`
+- Search for a product name
 
 **Min Price**
-- Show products above a certain price
-- Example: `20`
+- Minimum product price
 
 **Max Price**
-- Show products below a certain price
-- Example: `50`
+- Maximum product price
 
 **Stock Filter**
-- Show only products matching stock status
+- Filter products by stock availability
 """)
 
 # -----------------------------
 # LOAD DATA
 # -----------------------------
-rows = get_products()
+try:
 
-if not rows:
-    st.warning("No products found.")
+    df = pd.read_csv("data/products.csv")
+
+except Exception as e:
+
+    st.error(f"Error loading CSV: {e}")
     st.stop()
 
-df = pd.DataFrame(
-    rows,
-    columns=[
-        "ID",
-        "URL",
-        "Title",
-        "Price",
-        "Stock"
-    ]
-)
+# -----------------------------
+# FIX COLUMN NAMES
+# -----------------------------
+df.columns = [
+    col.strip().title()
+    for col in df.columns
+]
 
 # -----------------------------
-# CLEAN PRICE COLUMN
+# PRICE CLEANING
 # -----------------------------
-df["Price"] = (
-    df["Price"]
-    .astype(str)
-    .str.replace("£", "", regex=False)
-    .str.replace("Â", "", regex=False)
-)
-
 df["Price"] = pd.to_numeric(
     df["Price"],
     errors="coerce"
@@ -113,8 +68,7 @@ df["Price"] = pd.to_numeric(
 st.sidebar.title("🔍 Filters")
 
 search = st.sidebar.text_input(
-    "Search Title",
-    help="Example: sharp, sapiens, velvet"
+    "Search Title"
 )
 
 min_price = st.sidebar.number_input(
@@ -129,10 +83,7 @@ max_price = st.sidebar.number_input(
 
 stock_filter = st.sidebar.selectbox(
     "Stock Status",
-    [
-        "All",
-        "In stock"
-    ]
+    ["All"] + sorted(df["Stock"].unique())
 )
 
 # -----------------------------
@@ -142,7 +93,6 @@ if search:
 
     df = df[
         df["Title"]
-        .astype(str)
         .str.contains(
             search,
             case=False,
@@ -163,7 +113,7 @@ if stock_filter != "All":
     ]
 
 # -----------------------------
-# KPI CARDS
+# KPIs
 # -----------------------------
 col1, col2, col3 = st.columns(3)
 
@@ -176,14 +126,9 @@ with col1:
 
 with col2:
 
-    avg_price = round(
-        df["Price"].mean(),
-        2
-    )
-
     st.metric(
         "💷 Average Price",
-        avg_price
+        round(df["Price"].mean(), 2)
     )
 
 with col3:
@@ -192,7 +137,11 @@ with col3:
         "✅ In Stock",
         len(
             df[
-                df["Stock"] == "In stock"
+                df["Stock"]
+                .str.contains(
+                    "In stock",
+                    na=False
+                )
             ]
         )
     )
@@ -229,42 +178,15 @@ st.dataframe(
 )
 
 # -----------------------------
-# DOWNLOADS
+# DOWNLOAD
 # -----------------------------
-st.subheader(
-    "⬇ Export Data"
-)
-
 csv = df.to_csv(
     index=False
 )
 
 st.download_button(
-    "Download CSV",
+    "⬇ Download CSV",
     csv,
     "products.csv",
     "text/csv"
-)
-
-# -----------------------------
-# URL SUMMARY
-# -----------------------------
-st.subheader(
-    "🌍 Sources"
-)
-
-source_counts = (
-    df["URL"]
-    .value_counts()
-    .reset_index()
-)
-
-source_counts.columns = [
-    "URL",
-    "Records"
-]
-
-st.dataframe(
-    source_counts,
-    use_container_width=True
 )
